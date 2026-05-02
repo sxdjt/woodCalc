@@ -302,6 +302,35 @@ function initTheme() {
 }
 
 // ============================================================
+// Tab switching
+// ============================================================
+
+/**
+ * Activates the tab with the given data-tab value, hiding all other panels.
+ * Persists the active tab to localStorage so it survives a restart.
+ *
+ * @param {string} tabName - The data-tab attribute value of the tab to activate.
+ */
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(button => {
+        const isActive = button.dataset.tab === tabName;
+        button.classList.toggle('active', isActive);
+        button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+
+    document.querySelectorAll('.panel').forEach(panel => {
+        panel.classList.toggle('hidden', panel.id !== 'panel-' + tabName);
+    });
+
+    // Re-focus the expression input when returning to the calculator tab
+    if (tabName === 'calc') {
+        refocusInput();
+    }
+
+    localStorage.setItem('woodcalc-tab', tabName);
+}
+
+// ============================================================
 // Event wiring
 // ============================================================
 
@@ -339,6 +368,10 @@ document.getElementById('cut-board').addEventListener('input', calculateCuts);
 document.getElementById('cut-pieces').addEventListener('input', calculateCuts);
 document.getElementById('cut-kerf').addEventListener('input', calculateCuts);
 
+document.querySelectorAll('.tab-btn').forEach(button => {
+    button.addEventListener('click', () => switchTab(button.dataset.tab));
+});
+
 document.getElementById('default-unit').addEventListener('change', () => {
     localStorage.setItem('woodcalc-default-unit', document.getElementById('default-unit').value);
     calculate();
@@ -355,5 +388,8 @@ const savedDefaultUnit = localStorage.getItem('woodcalc-default-unit');
 if (savedDefaultUnit !== null) {
     document.getElementById('default-unit').value = savedDefaultUnit;
 }
+
+const savedTab = localStorage.getItem('woodcalc-tab');
+if (savedTab) switchTab(savedTab);
 
 document.getElementById('expression').focus();
