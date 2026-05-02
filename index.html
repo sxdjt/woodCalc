@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wood Shop Calc</title>
+</head>
+<body>
+<div class="app">
+
+    <!-- Header -->
+    <header>
+        <span class="title" aria-hidden="true">Wood Shop Calc</span>
+        <button class="btn-theme" id="btn-theme" aria-label="Switch to light mode">light</button>
+    </header>
+
+    <!-- Expression display -->
+    <div class="display">
+        <input type="text" id="expression"
+               aria-label="Expression"
+               placeholder='e.g. 5" + 12mm'
+               autocomplete="off"
+               spellcheck="false">
+        <div class="error-line" id="error" role="alert" aria-live="polite"></div>
+        <div class="display-controls">
+            <label class="display-ctrl-label" for="default-unit">Default unit</label>
+            <select id="default-unit" aria-label="Default unit for bare numbers">
+                <option value="">none</option>
+                <option value='"'>" (in)</option>
+                <option value="'">&#x27; (ft)</option>
+                <option value="mm">mm</option>
+                <option value="cm">cm</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Results panel -->
+    <div class="results" role="region" aria-label="Calculator results" aria-live="polite">
+        <div class="result-row">
+            <span class="result-label">Decimal</span>
+            <div class="result-right">
+                <span class="result-value empty" id="decimal-inches" aria-label="Decimal inches">-</span>
+            </div>
+        </div>
+        <div class="result-row">
+            <span class="result-label">Fractional</span>
+            <div class="result-right">
+                <span class="result-value empty" id="fractional-inches" aria-label="Fractional inches">-</span>
+                <label for="precision" class="sr-only">Precision</label>
+                <select id="precision" aria-label="Fractional precision">
+                    <option value="2">1/2"</option>
+                    <option value="4">1/4"</option>
+                    <option value="8">1/8"</option>
+                    <option value="16" selected>1/16"</option>
+                    <option value="32">1/32"</option>
+                    <option value="64">1/64"</option>
+                </select>
+            </div>
+        </div>
+        <div class="result-row">
+            <span class="result-label">Metric</span>
+            <div class="result-right">
+                <span class="result-value empty" id="metric" aria-label="Metric">-</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keypad -->
+    <div class="keypad" role="group" aria-label="Keypad">
+
+        <!-- Unit row: 6 columns -->
+        <div class="krow krow-6">
+            <button class="btn btn-unit" data-insert='"'  aria-label="Inches">"</button>
+            <button class="btn btn-unit" data-insert="'"  aria-label="Feet">'</button>
+            <button class="btn btn-unit" data-insert="mm" aria-label="Millimetres">mm</button>
+            <button class="btn btn-unit" data-insert="cm" aria-label="Centimetres">cm</button>
+            <button class="btn btn-unit" data-insert="m"  aria-label="Metres">m</button>
+            <button class="btn btn-unit" data-insert="/"  aria-label="Fraction slash">/</button>
+        </div>
+
+        <!-- Function row: AC | () | DEL | div -->
+        <div class="krow krow-4">
+            <button class="btn btn-func" data-action="clear"  aria-label="Clear all">AC</button>
+            <button class="btn btn-func" data-action="paren"  aria-label="Parenthesis">( )</button>
+            <button class="btn btn-func" data-action="delete" aria-label="Delete">&#x232B;</button>
+            <button class="btn btn-op"   data-insert="/"      aria-label="Divide">&#xF7;</button>
+        </div>
+
+        <!-- 7 8 9 x -->
+        <div class="krow krow-4">
+            <button class="btn btn-num" data-insert="7">7</button>
+            <button class="btn btn-num" data-insert="8">8</button>
+            <button class="btn btn-num" data-insert="9">9</button>
+            <button class="btn btn-op"  data-insert="*" aria-label="Multiply">&#xD7;</button>
+        </div>
+
+        <!-- 4 5 6 - -->
+        <div class="krow krow-4">
+            <button class="btn btn-num" data-insert="4">4</button>
+            <button class="btn btn-num" data-insert="5">5</button>
+            <button class="btn btn-num" data-insert="6">6</button>
+            <button class="btn btn-op"  data-insert="-" aria-label="Subtract">&#x2212;</button>
+        </div>
+
+        <!-- 1 2 3 + -->
+        <div class="krow krow-4">
+            <button class="btn btn-num" data-insert="1">1</button>
+            <button class="btn btn-num" data-insert="2">2</button>
+            <button class="btn btn-num" data-insert="3">3</button>
+            <button class="btn btn-op"  data-insert="+">+</button>
+        </div>
+
+        <!-- 0 (wide)  .  = -->
+        <div class="krow krow-4">
+            <button class="btn btn-num btn-wide" data-insert="0">0</button>
+            <button class="btn btn-num"          data-insert=".">.</button>
+            <button class="btn btn-eq"           data-action="equals" aria-label="Calculate">=</button>
+        </div>
+
+    </div>
+
+    <!-- Syntax hint -->
+    <div class="hint">
+        Fractions: <code>3/4"</code> &nbsp; <code>1-3/4"</code>
+        &nbsp;|&nbsp;
+        Feet+in: <code>5' 6"</code> &nbsp; <code>5' 1-3/4"</code>
+        &nbsp;|&nbsp;
+        Also: <code>ft</code> <code>mm</code> <code>cm</code> <code>m</code>
+        &nbsp;|&nbsp; Esc clears
+    </div>
+
+    <!-- Cut calculator -->
+    <div class="section-divider">
+        <span class="section-label">Cut Calculator</span>
+    </div>
+
+    <div class="cut-inputs">
+        <div class="cut-row">
+            <div class="cut-field cut-field-wide">
+                <label class="cut-label" for="cut-board">Board length</label>
+                <input type="text" id="cut-board" class="cut-input"
+                       placeholder="e.g. 8'" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="cut-field">
+                <label class="cut-label" for="cut-pieces">Pieces</label>
+                <input type="number" id="cut-pieces" class="cut-input" min="2" max="999" value="2">
+            </div>
+        </div>
+        <div class="cut-row">
+            <div class="cut-field">
+                <label class="cut-label" for="cut-kerf">Kerf</label>
+                <input type="text" id="cut-kerf" class="cut-input"
+                       value='1/8"' autocomplete="off" spellcheck="false">
+            </div>
+        </div>
+    </div>
+
+    <div class="results" role="region" aria-label="Cut calculator results" aria-live="polite">
+        <div class="result-row">
+            <span class="result-label">Each piece</span>
+            <div class="result-right">
+                <span class="result-value empty" id="cut-piece-frac" aria-label="Piece length fractional">-</span>
+            </div>
+        </div>
+        <div class="result-row">
+            <span class="result-label">Each piece</span>
+            <div class="result-right">
+                <span class="result-value empty" id="cut-piece-metric" aria-label="Piece length metric">-</span>
+            </div>
+        </div>
+        <div class="result-row">
+            <span class="result-label" id="cut-kerf-label">Kerf waste</span>
+            <div class="result-right">
+                <span class="result-value empty" id="cut-kerf-waste" aria-label="Total kerf waste">-</span>
+            </div>
+        </div>
+    </div>
+    <div class="cut-error" id="cut-error" role="alert" aria-live="polite"></div>
+
+</div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

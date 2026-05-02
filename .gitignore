@@ -1,0 +1,8 @@
+node_modules/
+dist/
+
+# Tauri build output
+src-tauri/target/
+
+# OS
+.DS_Store
