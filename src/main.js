@@ -3,13 +3,15 @@
 import "./style.css";
 import {
     evaluate,
-    preprocessExpression,
-    tokenize,
-    evaluateTokens,
     toFractionalInches,
     toMetric,
     toDecimalInches,
 } from "./calculator.js";
+import {
+    solveRightTriangle,
+    formatDegrees,
+    formatComplementary,
+} from "./angle-calculator.js";
 
 /** Most recent valid result in decimal inches; null when expression is invalid or empty. */
 let lastInchValue = null;
@@ -302,6 +304,117 @@ function initTheme() {
 }
 
 // ============================================================
+// Angle calculator
+// ============================================================
+
+/**
+ * Tries to parse an angle input string into a decimal degree value.
+ * Returns null if the field is empty; throws if the value is invalid.
+ *
+ * @param {string} rawInput
+ * @returns {number|null}
+ */
+function parseAngleDegrees(rawInput) {
+    if (!rawInput.trim()) return null;
+    const value = parseFloat(rawInput);
+    if (isNaN(value)) throw new Error('Angle must be a number (e.g. 45 or 33.5)');
+    return value;
+}
+
+/**
+ * Tries to parse a measurement string into decimal inches using the shared
+ * calculator engine. Returns null if the field is empty.
+ *
+ * @param {string} rawInput
+ * @param {string} defaultUnit
+ * @returns {number|null}
+ */
+function parseMeasurementOrNull(rawInput, defaultUnit) {
+    if (!rawInput.trim()) return null;
+    return evaluate(rawInput, defaultUnit);
+}
+
+/**
+ * Reads the four angle calculator inputs, solves the right triangle if exactly
+ * two fields have values, and updates the results panel.
+ */
+function calculateAngle() {
+    const errorEl    = document.getElementById('angle-error');
+    const defaultUnit = document.getElementById('default-unit').value;
+    const precision   = parseInt(document.getElementById('precision').value, 10);
+
+    // Parse each field independently - a parse error in one is not fatal
+    // unless that field is one of the two the solver will use
+    let angle = null, run = null, rise = null, hyp = null;
+    let parseError = null;
+
+    try { angle = parseAngleDegrees(document.getElementById('angle-deg').value); }
+    catch (err) { parseError = err.message; }
+
+    try { run = parseMeasurementOrNull(document.getElementById('angle-run').value, defaultUnit); }
+    catch (err) { parseError = parseError || err.message; }
+
+    try { rise = parseMeasurementOrNull(document.getElementById('angle-rise').value, defaultUnit); }
+    catch (err) { parseError = parseError || err.message; }
+
+    try { hyp = parseMeasurementOrNull(document.getElementById('angle-hyp').value, defaultUnit); }
+    catch (err) { parseError = parseError || err.message; }
+
+    const filledCount = [angle, run, rise, hyp].filter(v => v !== null).length;
+
+    if (filledCount === 0) {
+        clearAngleResults();
+        errorEl.textContent = '';
+        return;
+    }
+
+    if (filledCount < 2) {
+        clearAngleResults();
+        errorEl.textContent = '';
+        return;
+    }
+
+    if (parseError) {
+        clearAngleResults();
+        errorEl.textContent = parseError;
+        return;
+    }
+
+    try {
+        const result = solveRightTriangle(angle, run, rise, hyp);
+        if (!result) { clearAngleResults(); return; }
+
+        errorEl.textContent = '';
+
+        setResult('angle-result-deg',  formatDegrees(result.angle));
+        setResult('angle-result-comp', formatComplementary(result.angle));
+
+        const lengthResult = (inches) =>
+            toFractionalInches(inches, precision) + '  /  ' + toMetric(inches);
+
+        setResult('angle-result-run',  lengthResult(result.run));
+        setResult('angle-result-rise', lengthResult(result.rise));
+        setResult('angle-result-hyp',  lengthResult(result.hypotenuse));
+
+    } catch (err) {
+        clearAngleResults();
+        errorEl.textContent = err.message;
+    }
+}
+
+/**
+ * Resets all angle result elements to the placeholder dash state.
+ */
+function clearAngleResults() {
+    ['angle-result-deg', 'angle-result-comp',
+     'angle-result-run', 'angle-result-rise', 'angle-result-hyp'].forEach(elementId => {
+        const el = document.getElementById(elementId);
+        el.textContent = '-';
+        el.classList.add('empty');
+    });
+}
+
+// ============================================================
 // Tab switching
 // ============================================================
 
@@ -367,6 +480,10 @@ document.querySelectorAll('.btn[data-action]').forEach(button => {
 document.getElementById('cut-board').addEventListener('input', calculateCuts);
 document.getElementById('cut-pieces').addEventListener('input', calculateCuts);
 document.getElementById('cut-kerf').addEventListener('input', calculateCuts);
+
+['angle-deg', 'angle-run', 'angle-rise', 'angle-hyp'].forEach(id => {
+    document.getElementById(id).addEventListener('input', calculateAngle);
+});
 
 document.querySelectorAll('.tab-btn').forEach(button => {
     button.addEventListener('click', () => switchTab(button.dataset.tab));

@@ -476,6 +476,67 @@ header {
 }
 
 
+/* ================================================================
+   ANGLE CALCULATOR
+   ================================================================ */
+
+/* Wraps an input and a fixed unit suffix (e.g. the degree symbol) */
+.suffixed-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.suffixed-input .cut-input {
+    padding-right: 28px; /* make room for the suffix */
+}
+
+.input-suffix {
+    position: absolute;
+    right: 10px;
+    color: var(--text-dim);
+    font-size: 1rem;
+    pointer-events: none;
+}
+
+/* Instructional line above the inputs on panels that need it */
+.panel-hint {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* ================================================================
+   TRIANGLE REFERENCE DIAGRAM
+   ================================================================ */
+.triangle-diagram {
+    display: block;
+    width: 100%;
+    max-width: 280px;
+    margin: 8px auto 0;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+/* Explicit fill/stroke so both themes work - currentColor is unreliable in WebKit SVG */
+.triangle-diagram polygon,
+.triangle-diagram path {
+    stroke: var(--text-dim);
+}
+
+.triangle-diagram text {
+    fill: var(--text-dim);
+}
+
+.triangle-diagram .diagram-small {
+    font-size: 9px;
+}
+
+/* ================================================================
+   VISUALLY HIDDEN
+   ================================================================ */
+
 /* Visually hidden but accessible to screen readers */
 .sr-only {
     position: absolute;

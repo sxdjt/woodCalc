@@ -20,6 +20,8 @@
                 aria-controls="panel-calc" data-tab="calc">Calculator</button>
         <button class="tab-btn" role="tab" aria-selected="false"
                 aria-controls="panel-cut" data-tab="cut">Cut List</button>
+        <button class="tab-btn" role="tab" aria-selected="false"
+                aria-controls="panel-angle" data-tab="angle">Angle</button>
     </nav>
 
     <!-- Panel: main calculator -->
@@ -177,6 +179,122 @@
             </div>
         </div>
         <div class="cut-error" id="cut-error" role="alert" aria-live="polite"></div>
+
+    </div>
+
+
+    <!-- Panel: angle calculator -->
+    <div class="panel hidden" id="panel-angle" role="tabpanel">
+
+        <p class="panel-hint">Fill in any two values. Leave the one you want to solve for blank.</p>
+
+        <div class="cut-inputs">
+            <div class="cut-row">
+                <div class="cut-field">
+                    <label class="cut-label" for="angle-deg">Angle</label>
+                    <div class="suffixed-input">
+                        <input type="text" id="angle-deg" class="cut-input"
+                               placeholder="e.g. 45" autocomplete="off" spellcheck="false">
+                        <span class="input-suffix" aria-hidden="true">°</span>
+                    </div>
+                </div>
+            </div>
+            <div class="cut-row">
+                <div class="cut-field">
+                    <label class="cut-label" for="angle-run">Run (adjacent)</label>
+                    <input type="text" id="angle-run" class="cut-input"
+                           placeholder='e.g. 12"' autocomplete="off" spellcheck="false">
+                </div>
+                <div class="cut-field">
+                    <label class="cut-label" for="angle-rise">Rise (opposite)</label>
+                    <input type="text" id="angle-rise" class="cut-input"
+                           placeholder='e.g. 9"' autocomplete="off" spellcheck="false">
+                </div>
+            </div>
+            <div class="cut-row">
+                <div class="cut-field">
+                    <label class="cut-label" for="angle-hyp">Hypotenuse</label>
+                    <input type="text" id="angle-hyp" class="cut-input"
+                           placeholder='e.g. 16"' autocomplete="off" spellcheck="false">
+                </div>
+            </div>
+        </div>
+
+        <div class="results" role="region" aria-label="Angle calculator results" aria-live="polite">
+            <div class="result-row">
+                <span class="result-label">Angle</span>
+                <div class="result-right">
+                    <span class="result-value empty" id="angle-result-deg">-</span>
+                </div>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Complementary</span>
+                <div class="result-right">
+                    <span class="result-value empty" id="angle-result-comp">-</span>
+                </div>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Run</span>
+                <div class="result-right">
+                    <span class="result-value empty" id="angle-result-run">-</span>
+                </div>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Rise</span>
+                <div class="result-right">
+                    <span class="result-value empty" id="angle-result-rise">-</span>
+                </div>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Hypotenuse</span>
+                <div class="result-right">
+                    <span class="result-value empty" id="angle-result-hyp">-</span>
+                </div>
+            </div>
+        </div>
+        <div class="cut-error" id="angle-error" role="alert" aria-live="polite"></div>
+
+        <!--
+            Reference diagram.
+            3-4-5 proportions: rise=90px, run=120px, hyp=150px, angle=36.87deg.
+            Vertices: A(38,25)=top, B(38,115)=right-angle, C(158,115)=theta.
+            All strokes/fills use currentColor so they inherit --text-dim from CSS.
+        -->
+        <svg class="triangle-diagram" viewBox="0 0 210 148" overflow="visible"
+             role="img" aria-label="Right triangle diagram labelling Rise, Run, Hypotenuse and the angle theta">
+
+            <!-- Triangle outline -->
+            <polygon points="38,25 38,115 158,115"
+                     fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+
+            <!-- Right-angle square marker at B (38,115) -->
+            <path d="M 38,105 L 48,105 L 48,115"
+                  fill="none" stroke="currentColor" stroke-width="1.5"/>
+
+            <!-- Angle arc at C (158,115): from run side to hyp side, 25px radius.
+                 Run point  : (133, 115)
+                 Hyp point  : C + 25 * normalize(A-C)  = (158-20, 115-15) = (138, 100) -->
+            <path d="M 133,115 A 25,25 0 0 0 138,100"
+                  fill="none" stroke="currentColor" stroke-width="1.5"/>
+
+            <!-- "Rise" - rotated to read upward along the left side -->
+            <text x="14" y="70" text-anchor="middle"
+                  transform="rotate(-90, 14, 70)">Rise</text>
+
+            <!-- "Run" - below the horizontal base -->
+            <text x="98" y="133" text-anchor="middle">Run</text>
+
+            <!-- "Hypotenuse" - rotated along the diagonal (36.87 deg) -->
+            <text x="105" y="60" text-anchor="middle"
+                  transform="rotate(36.87, 105, 60)">Hypotenuse</text>
+
+            <!-- theta symbol inside the angle arc -->
+            <text x="127" y="104">&#x3B8;</text>
+
+            <!-- 90 deg label inside the right-angle square -->
+            <text x="51" y="108" class="diagram-small">90°</text>
+
+        </svg>
 
     </div>
 
